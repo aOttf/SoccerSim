@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Ball : MonoBehaviour
+using SteeringSystem;
+
+public class Ball : SteerEntity
 {
     public PlayerAgent owner;
     [Range(0, 1f)] public float followFactor;
@@ -11,11 +13,19 @@ public class Ball : MonoBehaviour
     #region Caches
 
     private Transform m_ts;
+    private PlayerController m_controller;
+
     private float m_kickStrength;
     private float m_drag;
     private float m_dribbleDistance;
 
     private Vector3 m_velocity; //Current Velocity of the ball
+
+    public override Vector3 linearVelocity { get => m_velocity; set => throw new System.NotSupportedException(); }
+
+    public override Vector3 position => m_ts.position;
+
+    public bool HasOwner => owner != null;
 
     #endregion Caches
 
@@ -26,6 +36,7 @@ public class Ball : MonoBehaviour
 
         //Initialize Parameters
         m_ts = GetComponent<Transform>();
+        m_controller = m_manager.controller;
 
         m_kickStrength = m_manager.kickStrength;
         m_drag = m_manager.dragStrength;
@@ -42,22 +53,29 @@ public class Ball : MonoBehaviour
     private void Update()
     {
         UpdateOwner();
+        if (HasOwner)
+            owner.OnCarryingBall();
+
         UpdateVelocity();
+
         UpdatePosition();
     }
 
     private void UpdateVelocity()
     {
-        if (!owner)
+        if (HasOwner)
+            m_velocity = owner.linearVelocity;
+        else
             m_velocity *= m_drag;
     }
 
     private void UpdatePosition()
     {
-        if (owner)
+        if (HasOwner)
         {
             //Lerp from current position to the owner position with offset
-            transform.position = Vector3.Slerp(transform.position, owner.OffsetPosition, followFactor);
+            //transform.position = Vector3.Slerp(transform.position, owner.OffsetPosition, followFactor);
+            transform.position = owner.OffsetPosition;
         }
         else
         {
@@ -119,10 +137,19 @@ public class Ball : MonoBehaviour
     {
         if (OnSnatch(player))
         {
+            //Update ball's owner
             owner = player;
+            owner.OnSnatchBall();
 
-            //Reset player's hold off time
-            player.OnResetHoldOffTimer();
+            ////Update player's max speed
+            //player.maxLinearSpeed = player.maxCarryingSpeed;
+
+            ////Reset owner's invicible time
+            //owner.OnResetHoldOffTimer();
+
+            ////If the player is on human-controlled team, switch controlling player to this
+            //if (player.IsHuman)
+            //    m_controller.OnSwitchPlayer(player);
 
             return true;
         }
@@ -132,12 +159,20 @@ public class Ball : MonoBehaviour
 
     /// <summary>
     /// If Player can snatch the soccer
+    /// Condition1 : Soccer doesn't have an owner or the invicible time of the owner has passed
+    /// Condition2 : close enough to the soccer
     /// </summary>
     /// <param name="player"></param>
     /// <returns></returns>
     public bool OnSnatch(PlayerAgent player)
     {
-        return (!owner || owner.TeamColor != player.TeamColor) && Vector3.SqrMagnitude(transform.position - player.transform.position) < m_dribbleDistance * m_dribbleDistance;
+        if (owner)
+        {
+            print(Vector3.SqrMagnitude(owner.position - player.position));
+            return !owner.IsInvulnerable && Vector3.SqrMagnitude(owner.position - player.position) < 1f;
+        }
+
+        return Vector3.SqrMagnitude(position - player.position) < 1f;
     }
 
     public void OnKick(Vector3 dir)

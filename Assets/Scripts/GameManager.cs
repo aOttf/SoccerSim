@@ -2,10 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoSingleton<GameManager>
 {
-    private static GameManager m_instance;
-
     #region Inspector Serializations
 
     [Header("Environment Parameters")]
@@ -69,6 +67,8 @@ public class GameManager : MonoBehaviour
 
     public List<PlayerAgent>[] players = new List<PlayerAgent>[2];
 
+    public PlayerController controller;
+
     #endregion Entities
 
     public Rect TeamGoal(TeamColor color) => color == TeamColor.Red ? m_goalAreaRed : m_goalAreaBlue;
@@ -79,32 +79,11 @@ public class GameManager : MonoBehaviour
 
     public List<PlayerAgent> Opponents(TeamColor color) => players[((int)color + 1) % 2];
 
-    /// <summary>
-    /// Singleton GameManager
-    /// </summary>
-    public static GameManager Instance
-    {
-        get
-        {
-            if (!m_instance)
-                m_instance = FindObjectOfType<GameManager>();
+    public TeamAgent Team(TeamColor color) => color == TeamColor.Red ? redTeam : blueTeam;
 
-            if (!m_instance)
-                Debug.LogError("Need At Least One Game Manager Instance Present.");
+    public TeamAgent OpponentTeam(TeamColor color) => color == TeamColor.Red ? blueTeam : redTeam;
 
-            m_instance.Init();
-            print(m_instance.soccer);
-            return m_instance;
-        }
-    }
-
-    // [SerializeField] private Params gameSettings;
-    //  public Params GameSettings => gameSettings;
-
-    /// <summary>
-    /// Initialize Game Manager Instance
-    /// </summary>
-    private void Init()
+    protected override void Init()
     {
         //initialize Cached Parameters
         halfLevelHeight = levelHeight / 2;
@@ -171,13 +150,6 @@ public class GameManager : MonoBehaviour
         DrawRect(new Rect(m_goalAreaRed.position, new Vector2(-scoreRange, goalHeight)));
     }
 
-    public bool OnRegion(Rect region, PlayerAgent player)
-        => region.Contains
-        (new Vector2(player.transform.position.x, player.transform.position.z));
-
-    public bool OutOfMap(PlayerAgent player)
-    => !OnRegion(m_pitchArea, player);
-
     public bool OutOfPitchWidth(Vector3 pos)
     {
         return pos.x < 0 || pos.x > pitchWidth;
@@ -194,6 +166,25 @@ public class GameManager : MonoBehaviour
     public Vector3 ClampPosition(Vector3 pos)
     {
         return new Vector3(Mathf.Clamp(pos.x, 0, pitchWidth), pos.y, Mathf.Clamp(pos.z, 0, pitchHeight));
+    }
+
+    public PlayerAgent NearestTeammate(TeamColor color)
+    {
+        List<PlayerAgent> teammates = Teammates(color);
+
+        PlayerAgent closest = null;
+        float dist = float.MaxValue;
+        float curDist = default;
+        foreach (var mate in teammates)
+        {
+            if ((curDist = (mate.position - soccer.transform.position).magnitude) < dist)
+            {
+                closest = mate;
+                dist = curDist;
+            }
+        }
+
+        return closest;
     }
 
     private void OnDrawGizmosSelected()

@@ -91,6 +91,12 @@ namespace SteeringSystem
 
     #endregion LEGACY
 
+    public abstract class SteerEntity : MonoBehaviour
+    {
+        public abstract Vector3 linearVelocity { get; set; }
+        public abstract Vector3 position { get; }
+    }
+
     /// <summary>
     /// The method blendedSteering used to combine steering behaviour outputs
     /// </summary>

@@ -4,7 +4,7 @@ using UnityEngine;
 
 using DecisionMaking.StateMachine;
 
-public class Attacking : TeamStateBehaviour
+public class Attacking : TeamFSMBase
 {
     // Start is called before the first frame update
     private void Start()

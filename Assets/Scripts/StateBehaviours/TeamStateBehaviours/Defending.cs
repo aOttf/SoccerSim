@@ -4,21 +4,21 @@ using UnityEngine;
 
 using DecisionMaking.StateMachine;
 
-public class Defending : TeamStateBehaviour
+public class Defending : TeamFSMBase
 {
-    protected override void Enter()
+    public override void OnEnter()
     {
-        base.Enter();
+        base.OnEnter();
     }
 
-    protected override void Execute()
+    public override void OnUpdate()
     {
-        base.Execute();
+        base.OnUpdate();
     }
 
-    protected override void Exit()
+    public override void OnExit()
     {
-        base.Exit();
+        base.OnExit();
     }
 
     // Start is called before the first frame update

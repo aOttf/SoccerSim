@@ -6,23 +6,20 @@ public class Goal : MonoBehaviour
 {
     private GameManager m_manager;
 
-    [Tooltip("Which team it belongs to")]
-    [SerializeField] private TeamAgent m_ownedTeam;
+    [Tooltip("The color of team it belongs to")]
+    [SerializeField] private TeamColor m_teamColor;
 
     #region Caches
 
-    private float m_shootOffset;
-    private float m_goalHeight;
+    private TeamAgent m_opponentTeam;
 
     #endregion Caches
 
     private void Awake()
     {
-        m_manager = GameManager.Instance;
-
         //Cache Parameters
-        m_shootOffset = m_manager.scoreRange;
-        m_goalHeight = m_manager.goalHeight;
+        m_manager = GameManager.Instance;
+        m_opponentTeam = m_manager.OpponentTeam(m_teamColor);
     }
 
     // Start is called before the first frame update
@@ -35,5 +32,14 @@ public class Goal : MonoBehaviour
     {
     }
 
-    public bool OnScore(Ball soccer) => Mathf.Abs(transform.position.x - soccer.transform.position.x) < m_shootOffset;
+    #region Callbacks
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        //Hit by the soccer
+        if (collision.gameObject == m_manager.soccer.gameObject)
+            m_opponentTeam.OnScore();
+    }
+
+    #endregion Callbacks
 }

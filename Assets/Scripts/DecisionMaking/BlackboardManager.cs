@@ -12,14 +12,14 @@ using static Blackboard;
 /// </summary>
 public class BlackboardManager : MonoBehaviour
 {
-    [SerializeField] private Blackboard blackboardInfo;
+    [SerializeField] private Blackboard m_blackboardInfo;
 
     #region Dictionaries Caches
 
-    private static Dictionary<string, int> m_intParameters;
-    private static Dictionary<string, float> m_floatParameters;
-    private static Dictionary<string, bool> m_boolParameters;
-    private static Dictionary<string, Trigger> m_triggerParameters;
+    private Dictionary<string, int> m_intParameters;
+    private Dictionary<string, float> m_floatParameters;
+    private Dictionary<string, bool> m_boolParameters;
+    private Dictionary<string, Trigger> m_triggerParameters;
 
     #endregion Dictionaries Caches
 
@@ -32,16 +32,16 @@ public class BlackboardManager : MonoBehaviour
 
     private void Init()
     {
-        //DontDestroyOnLoad(gameObject);
+        //   DontDestroyOnLoad(gameObject);
 
         m_intParameters = new Dictionary<string, int>();
         m_floatParameters = new Dictionary<string, float>();
         m_boolParameters = new Dictionary<string, bool>();
         m_triggerParameters = new Dictionary<string, Trigger>();
-        blackboardInfo.LoadIntegers(m_intParameters);
-        blackboardInfo.LoadFloats(m_floatParameters);
-        blackboardInfo.LoadBools(m_boolParameters);
-        blackboardInfo.LoadTriggers(m_triggerParameters);
+        m_blackboardInfo.LoadIntegers(m_intParameters);
+        m_blackboardInfo.LoadFloats(m_floatParameters);
+        m_blackboardInfo.LoadBools(m_boolParameters);
+        m_blackboardInfo.LoadTriggers(m_triggerParameters);
     }
 
     public float GetFloat(string pName) => m_floatParameters[pName];

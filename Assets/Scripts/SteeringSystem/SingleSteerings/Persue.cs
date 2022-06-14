@@ -5,13 +5,20 @@ namespace SteeringSystem
 {
     public class Persue : SteeringBehaviour
     {
+        [Header("Persue Params")]
+        public SteerEntity target;
+
+        [Tooltip("Max Possible time to predict the target")]
+        public float time2Predict = .1f;
+
+        [Tooltip("Max Signed Angle Degree to Ignore the Prediction")]
+        public float angle2Predict = 30f;
+
+        #region Caches
+
         protected Vector3 m_targetPosition; //The final predicted target's position
 
-        public float time2Predict = .1f;  //Max Possible time to predict the target
-        public float angle2Predict = 30f; //Max Signed Angle Degree to Ignore the Prediction
-
-        public MatchMode mode = MatchMode.MatchPosition;
-        [SerializeField] public SteerAgent target;
+        #endregion Caches
 
         protected override Vector3 GetSteering()
         {

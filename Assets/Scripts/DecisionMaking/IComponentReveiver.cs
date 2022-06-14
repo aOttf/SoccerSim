@@ -10,3 +10,7 @@ public interface IComponentReveiver<T> where T : Component
 {
     public T AddComponent(T component);
 }
+
+public interface IHFSMBase
+{
+}
