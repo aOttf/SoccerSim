@@ -10,3 +10,4 @@ Implement a two-tier AI system with ![Hierarchical Finite State Machine](https:/
 ![Human-Controlled Player](https://user-images.githubusercontent.com/49035217/173270061-c8155032-276a-4670-a9c2-feb0ff81d80a.png)
 
 # AI-Controlled Player
+![AI-Controlled Player](https://user-images.githubusercontent.com/49035217/173724511-a12499aa-df36-4c06-91f3-b6daa19c21b5.png)
